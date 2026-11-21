@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load shop %}
+{% block title %}{% if product %}Edit {{ product.name }}{% else %}New product{% endif %}{% endblock %}
+{% block content %}{% include "vendors/_nav.html" %}
+<h1>{% if product %}Edit product{% else %}New product{% endif %}</h1>
+<div class="two-col-page">
+<form method="post" enctype="multipart/form-data" class="card pad">{% csrf_token %}{% include "partials/form.html" %}<button class="btn btn-lg">Save product</button> <a href="{% url 'vendor_products' %}">Cancel</a></form>
+{% if product %}
+<div>
+  <section class="card pad"><h2>Variants (size / colour…)</h2><p class="muted small">When variants exist, stock is the sum of variant stock.</p>
+    {% for v in variants %}<div class="item-row"><span>{{ v.name }} · {{ v.price|money }} · {{ v.stock }} in stock</span>
+      <form method="post" action="{% url 'vendor_variant_delete' v.pk %}">{% csrf_token %}<button class="link danger">Remove</button></form></div>{% endfor %}
+    <form method="post" action="{% url 'vendor_variant_add' product.pk %}">{% csrf_token %}{% include "partials/form.html" with form=variant_form %}<button class="btn btn-sm">Add variant</button></form></section>
+  <section class="card pad"><h2>Gallery images</h2>
+    <div class="thumbs">{% for g in gallery %}<form method="post" action="{% url 'vendor_image_delete' g.pk %}">{% csrf_token %}<img src="{{ g.image.url }}" alt=""><button class="link danger">Remove</button></form>{% endfor %}</div>
+    <form method="post" enctype="multipart/form-data" action="{% url 'vendor_image_add' product.pk %}">{% csrf_token %}{% include "partials/form.html" with form=image_form %}<button class="btn btn-sm">Upload image</button></form></section>
+</div>{% endif %}
+</div>{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ vendor.store_name }} – {{ SHOP_NAME }}{% endblock %}
+{% block meta_desc %}{{ vendor.description|truncatechars:150 }}{% endblock %}
+{% block content %}
+<section class="store-head card pad">{% if vendor.logo %}<img src="{{ vendor.logo.url }}" alt="" class="logo-img">{% else %}<div class="ph logo-img">🏪</div>{% endif %}
+<div><h1>{{ vendor.store_name }}</h1><p>{{ vendor.description|default:"Welcome to our store!" }}</p><small class="muted">Selling since {{ vendor.created|date:"F Y" }}</small></div></section>
+<div class="list-head"><h2>Products ({{ page.paginator.count }})</h2>
+<form method="get" class="sort"><select name="sort" onchange="this.form.submit()"><option value="newest" {% if sort == "newest" %}selected{% endif %}>Newest</option><option value="price_asc" {% if sort == "price_asc" %}selected{% endif %}>Price ↑</option><option value="price_desc" {% if sort == "price_desc" %}selected{% endif %}>Price ↓</option><option value="rating" {% if sort == "rating" %}selected{% endif %}>Top rated</option></select></form></div>
+<div class="grid">{% for p in page %}{% include "partials/product_card.html" %}{% empty %}<p class="muted">No products yet.</p>{% endfor %}</div>
+{% include "partials/pagination.html" %}{% endblock %}

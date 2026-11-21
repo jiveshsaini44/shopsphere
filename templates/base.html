@@ -1,0 +1,75 @@
+{% load static shop %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ SHOP_NAME }} – Multi-vendor marketplace{% endblock %}</title>
+  <meta name="description" content="{% block meta_desc %}Shop thousands of products from independent sellers in one cart.{% endblock %}">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <meta name="theme-color" content="#4f46e5">
+  <link rel="manifest" href="{% url 'manifest' %}">
+  <link rel="icon" href="{% static 'img/icon-192.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'img/icon-192.png' %}">
+  <meta property="og:site_name" content="{{ SHOP_NAME }}">
+  <meta property="og:title" content="{% block og_title %}{{ SHOP_NAME }}{% endblock %}">
+  <script>try{var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t;else if(matchMedia('(prefers-color-scheme: dark)').matches)document.documentElement.dataset.theme='dark'}catch(e){}</script>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="topbar">Free shipping on orders over {{ CURRENCY }}{{ FREE_SHIPPING }} · 14-day returns · Secure checkout</div>
+<header class="site-header">
+  <div class="container header-row">
+    <a class="logo" href="{% url 'home' %}">🛍️ {{ SHOP_NAME }}</a>
+    <form class="search" action="{% url 'product_list' %}" method="get" role="search">
+      <input id="search-input" type="search" name="q" placeholder="Search products, brands, stores…" autocomplete="off" aria-label="Search" value="{{ q|default:'' }}">
+      <button type="submit" aria-label="Search">🔍</button>
+      <div id="suggest" class="suggest" hidden></div>
+    </form>
+    <nav class="icons" aria-label="Account">
+      <button class="icon-btn" id="theme-toggle" type="button" title="Toggle dark mode" aria-label="Toggle dark mode">🌓</button>
+      {% if user.is_authenticated %}
+        <a class="icon-btn" href="{% url 'wishlist' %}" title="Wishlist">♡</a>
+        <a class="icon-btn" href="{% url 'notifications' %}" title="Notifications">🔔{% if unread_count %}<span class="badge">{{ unread_count }}</span>{% endif %}</a>
+        <details class="menu"><summary class="icon-btn">👤 {{ user.first_name|default:user.username }}</summary>
+          <div class="menu-body">
+            <a href="{% url 'order_list' %}">My orders</a>
+            <a href="{% url 'profile' %}">Profile</a>
+            <a href="{% url 'addresses' %}">Addresses</a>
+            {% if user.vendor %}<a href="{% url 'vendor_dashboard' %}">Seller dashboard</a>{% else %}<a href="{% url 'vendor_apply' %}">Sell on {{ SHOP_NAME }}</a>{% endif %}
+            {% if user.is_staff %}<a href="{% url 'admin:index' %}">Admin panel</a>{% endif %}
+            <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Log out</button></form>
+          </div></details>
+      {% else %}
+        <a class="icon-btn" href="{% url 'login' %}">Log in</a>
+        <a class="btn btn-sm" href="{% url 'register' %}">Sign up</a>
+      {% endif %}
+      <a class="icon-btn cart-link" href="{% url 'cart' %}" title="Cart">🛒<span class="badge" id="cart-badge" {% if not cart_count %}hidden{% endif %}>{{ cart_count }}</span></a>
+    </nav>
+  </div>
+  <div class="container cats">
+    <a href="{% url 'product_list' %}">All</a>
+    {% for c in nav_categories %}<a href="{{ c.get_absolute_url }}">{{ c.icon }} {{ c.name }}</a>{% endfor %}
+    <a href="{% url 'product_list' %}?on_sale=1">🔥 Deals</a>
+  </div>
+</header>
+
+<main id="main" class="container">
+  {% if messages %}<div class="messages">{% for m in messages %}<div class="msg msg-{{ m.tags }}" role="status">{{ m }}</div>{% endfor %}</div>{% endif %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="container foot-grid">
+    <div><strong>{{ SHOP_NAME }}</strong><p>One cart, many independent stores.</p></div>
+    <div><strong>Company</strong><a href="{% url 'page_about' %}">About</a><a href="{% url 'page_contact' %}">Contact</a><a href="{% url 'vendor_apply' %}">Become a seller</a></div>
+    <div><strong>Help</strong><a href="{% url 'page_shipping' %}">Shipping &amp; returns</a><a href="{% url 'order_list' %}">Track order</a></div>
+    <div><strong>Legal</strong><a href="{% url 'page_privacy' %}">Privacy</a><a href="{% url 'page_terms' %}">Terms</a></div>
+  </div>
+  <p class="copy">© {% now "Y" %} {{ SHOP_NAME }}</p>
+</footer>
+<div id="toasts" aria-live="polite"></div>
+<script src="{% static 'js/app.js' %}" defer></script>
+</body>
+</html>

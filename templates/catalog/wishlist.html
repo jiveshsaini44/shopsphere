@@ -1,0 +1,4 @@
+{% extends "base.html" %}
+{% block title %}My wishlist{% endblock %}
+{% block content %}<h1>My wishlist</h1>
+<div class="grid">{% for w in items %}{% with p=w.product %}{% include "partials/product_card.html" %}{% endwith %}{% empty %}<p class="muted">Nothing saved yet. Tap ♡ on any product.</p>{% endfor %}</div>{% endblock %}

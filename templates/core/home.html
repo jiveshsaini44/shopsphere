@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div><h1>Everything you love, from stores you can trust.</h1>
+  <p>Shop independent sellers in a single cart. Fast checkout, easy returns.</p>
+  <a class="btn btn-lg" href="{% url 'product_list' %}">Start shopping</a>
+  <a class="btn btn-lg btn-ghost" href="{% url 'vendor_apply' %}">Sell with us</a></div>
+</section>
+
+<section><h2>Shop by category</h2>
+<div class="chips">{% for c in categories %}<a class="chip" href="{{ c.get_absolute_url }}">{{ c.icon }} {{ c.name }}</a>{% endfor %}</div></section>
+
+{% if featured %}<section><h2>Featured</h2><div class="grid">{% for p in featured %}{% include "partials/product_card.html" %}{% endfor %}</div></section>{% endif %}
+<section><h2>New arrivals</h2><div class="grid">{% for p in new_arrivals %}{% include "partials/product_card.html" %}{% empty %}<p class="muted">No products yet. Run <code>python manage.py seed_demo</code>.</p>{% endfor %}</div></section>
+{% if top_rated %}<section><h2>Top rated</h2><div class="grid">{% for p in top_rated %}{% include "partials/product_card.html" %}{% endfor %}</div></section>{% endif %}
+{% if recent %}<section><h2>Recently viewed</h2><div class="grid">{% for p in recent %}{% include "partials/product_card.html" %}{% endfor %}</div></section>{% endif %}
+{% endblock %}

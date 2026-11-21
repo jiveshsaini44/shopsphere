@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}My addresses{% endblock %}
+{% block content %}<h1>My addresses</h1>
+<div class="two-col-page"><section>
+{% for a in addresses %}<div class="card pad"><strong>{{ a.full_name }}</strong> {% if a.is_default %}<span class="pill">Default</span>{% endif %}<br>{{ a.line1 }} {{ a.line2 }}<br>{{ a.city }} {{ a.state }} {{ a.postal_code }}, {{ a.country }}<br>{{ a.phone }}
+<div class="row">{% if not a.is_default %}<form method="post" action="{% url 'address_default' a.pk %}">{% csrf_token %}<button class="btn btn-sm btn-ghost">Make default</button></form>{% endif %}
+<form method="post" action="{% url 'address_delete' a.pk %}">{% csrf_token %}<button class="btn btn-sm btn-danger">Delete</button></form></div></div>
+{% empty %}<p class="muted">No saved addresses.</p>{% endfor %}</section>
+<form method="post" class="card pad"><h2>Add address</h2>{% csrf_token %}{% include "partials/form.html" %}<button class="btn">Save address</button></form></div>{% endblock %}

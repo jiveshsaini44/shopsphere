@@ -1,0 +1,5 @@
+<nav class="subnav">
+  <a href="{% url 'vendor_dashboard' %}">Dashboard</a><a href="{% url 'vendor_products' %}">Products</a><a href="{% url 'vendor_orders' %}">Orders</a>
+  <a href="{% url 'vendor_returns' %}">Returns</a><a href="{% url 'vendor_payouts' %}">Payouts</a><a href="{% url 'vendor_settings' %}">Store settings</a>
+  <a href="{{ request.user.vendor.get_absolute_url }}">View my store ↗</a>
+</nav>

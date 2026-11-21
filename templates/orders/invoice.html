@@ -1,0 +1,9 @@
+{% load shop %}<!doctype html><html><head><meta charset="utf-8"><title>Invoice {{ order.order_number }}</title>
+<style>body{font-family:system-ui,sans-serif;max-width:760px;margin:2rem auto;padding:0 1rem;color:#111}table{width:100%;border-collapse:collapse}th,td{padding:.5rem;border-bottom:1px solid #ddd;text-align:left}td.r,th.r{text-align:right}@media print{button{display:none}}</style></head>
+<body><button onclick="window.print()">Print</button>
+<h1>{{ SHOP_NAME }} – Invoice</h1><p><strong>{{ order.order_number }}</strong><br>{{ order.created|date:"F j, Y" }}</p>
+<p><strong>Billed/shipped to</strong><br>{{ order.ship_name }}<br>{{ order.ship_line1 }} {{ order.ship_line2 }}<br>{{ order.ship_city }} {{ order.ship_state }} {{ order.ship_postal }}, {{ order.ship_country }}</p>
+<table><tr><th>Item</th><th>Seller</th><th class="r">Qty</th><th class="r">Price</th><th class="r">Total</th></tr>
+{% for i in order.items.all %}<tr><td>{{ i.name }} {{ i.variant_name }}</td><td>{{ i.vendor.store_name }}</td><td class="r">{{ i.quantity }}</td><td class="r">{{ i.price|money }}</td><td class="r">{{ i.line_total|money }}</td></tr>{% endfor %}</table>
+<p class="r" style="text-align:right">Subtotal {{ order.subtotal|money }}<br>{% if order.discount %}Discount -{{ order.discount|money }}<br>{% endif %}Shipping {{ order.shipping|money }}<br>Tax {{ order.tax|money }}<br><strong>Total {{ order.total|money }}</strong><br>Payment: {{ order.get_payment_method_display }} ({{ order.get_payment_status_display }})</p>
+</body></html>

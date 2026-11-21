@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load shop %}
+{% block title %}Checkout – {{ SHOP_NAME }}{% endblock %}
+{% block content %}
+<h1>Checkout</h1>
+<form method="post" class="checkout">{% csrf_token %}
+  <div>
+    <section class="card pad"><h2>1. Shipping address</h2>
+      {% for e in form.non_field_errors %}<p class="err">{{ e }}</p>{% endfor %}
+      {% for a in addresses %}
+      <label class="addr-opt"><input type="radio" name="address_id" value="{{ a.pk }}" {% if forloop.first %}checked{% endif %}>
+        <span><strong>{{ a.full_name }}</strong> · {{ a.phone }}<br>{{ a.line1 }} {{ a.line2 }}, {{ a.city }} {{ a.state }} {{ a.postal_code }}, {{ a.country }}</span></label>
+      {% endfor %}
+      <label class="addr-opt"><input type="radio" name="address_id" value="" {% if not addresses %}checked{% endif %}> <span>Use a new address</span></label>
+      <div id="new-address" class="two-col" {% if addresses %}hidden{% endif %}>
+        <div class="field"><label>Full name</label><input name="full_name" value="{{ form.full_name.value|default:'' }}">{% for e in form.full_name.errors %}<p class="err">{{ e }}</p>{% endfor %}</div>
+        <div class="field"><label>Phone</label><input name="phone" value="{{ form.phone.value|default:'' }}">{% for e in form.phone.errors %}<p class="err">{{ e }}</p>{% endfor %}</div>
+        <div class="field full"><label>Address line 1</label><input name="line1" value="{{ form.line1.value|default:'' }}">{% for e in form.line1.errors %}<p class="err">{{ e }}</p>{% endfor %}</div>
+        <div class="field full"><label>Address line 2</label><input name="line2" value="{{ form.line2.value|default:'' }}"></div>
+        <div class="field"><label>City</label><input name="city" value="{{ form.city.value|default:'' }}">{% for e in form.city.errors %}<p class="err">{{ e }}</p>{% endfor %}</div>
+        <div class="field"><label>State / Region</label><input name="state" value="{{ form.state.value|default:'' }}"></div>
+        <div class="field"><label>Postal code</label><input name="postal_code" value="{{ form.postal_code.value|default:'' }}">{% for e in form.postal_code.errors %}<p class="err">{{ e }}</p>{% endfor %}</div>
+        <div class="field"><label>Country</label><input name="country" value="{{ form.country.value|default:'United States' }}"></div>
+        <label class="check full"><input type="checkbox" name="save_address" value="on"> Save this address for next time</label>
+      </div>
+    </section>
+    <section class="card pad"><h2>2. Payment</h2>
+      <label class="addr-opt"><input type="radio" name="payment_method" value="card" checked> <span>💳 Credit / debit card <small class="muted">(secure test gateway)</small></span></label>
+      <label class="addr-opt"><input type="radio" name="payment_method" value="cod"> <span>💵 Cash on delivery</span></label>
+    </section>
+  </div>
+  <aside class="card pad summary"><h2>Order summary</h2>
+    <ul class="mini">{% for i in t.items %}<li><span>{{ i.quantity }} × {{ i.product.name }}{% if i.variant %} <small>({{ i.variant.name }})</small>{% endif %}</span><span>{{ i.line_total|money }}</span></li>{% endfor %}</ul>
+    <dl class="totals"><dt>Subtotal</dt><dd>{{ t.subtotal|money }}</dd>
+      {% if t.discount %}<dt>Discount {% if t.coupon %}({{ t.coupon.code }}){% endif %}</dt><dd class="ok">-{{ t.discount|money }}</dd>{% endif %}
+      <dt>Shipping</dt><dd>{% if t.shipping %}{{ t.shipping|money }}{% else %}Free{% endif %}</dd>
+      <dt>Tax</dt><dd>{{ t.tax|money }}</dd><dt class="grand">Total</dt><dd class="grand">{{ t.total|money }}</dd></dl>
+    <button class="btn btn-lg btn-block" type="submit">Place order</button>
+    <p class="muted small">By placing your order you agree to our <a href="{% url 'page_terms' %}">terms</a>.</p>
+  </aside>
+</form>
+{% endblock %}

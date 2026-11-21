@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Sell on {{ SHOP_NAME }}{% endblock %}
+{% block content %}<div class="narrow"><h1>Sell on {{ SHOP_NAME }}</h1>
+{% if vendor %}
+  <div class="msg msg-{% if vendor.status == 'pending' %}info{% else %}error{% endif %}">Your store “{{ vendor.store_name }}” is <strong>{{ vendor.get_status_display|lower }}</strong>.
+  {% if vendor.status == "pending" %}An admin will review it shortly – you'll get a notification once approved.{% else %}Contact support for details.{% endif %}</div>
+{% else %}
+  <p>Open your own storefront, reach thousands of shoppers, and get paid out regularly. The marketplace keeps a small commission on each sale.</p>
+  <form method="post" class="card pad">{% csrf_token %}{% include "partials/form.html" %}<button class="btn btn-lg btn-block">Apply to sell</button></form>
+{% endif %}</div>{% endblock %}

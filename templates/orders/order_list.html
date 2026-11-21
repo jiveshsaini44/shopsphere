@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load shop %}
+{% block title %}My orders{% endblock %}
+{% block content %}<h1>My orders</h1>
+{% for o in orders %}
+<a class="card pad order-row" href="{% url 'order_detail' o.order_number %}">
+  <div><strong>{{ o.order_number }}</strong><br><small class="muted">{{ o.created|date:"M j, Y" }} · {{ o.items.all|length }} item(s)</small></div>
+  <div><span class="pill st-{{ o.status }}">{{ o.get_status_display }}</span> <span class="pill">{{ o.get_payment_status_display }}</span></div>
+  <div class="price">{{ o.total|money }}</div></a>
+{% empty %}<p class="muted">You haven't ordered anything yet. <a href="{% url 'product_list' %}">Start shopping</a></p>{% endfor %}
+{% endblock %}

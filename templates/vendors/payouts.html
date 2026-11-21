@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load shop %}
+{% block title %}Payouts{% endblock %}
+{% block content %}{% include "vendors/_nav.html" %}<h1>Earnings &amp; payouts</h1>
+<div class="stats"><div class="card pad stat"><small>Total earned (delivered)</small><strong>{{ vendor.earned|money }}</strong></div>
+<div class="card pad stat"><small>Paid / requested</small><strong>{{ vendor.paid_out|money }}</strong></div>
+<div class="card pad stat"><small>Available</small><strong>{{ vendor.balance|money }}</strong></div></div>
+<form method="post" action="{% url 'vendor_payout_request' %}" class="card pad inline">{% csrf_token %}<label>Request payout (min {{ CURRENCY }}{{ min_payout }})</label>
+<input type="number" name="amount" step="0.01" min="0" required placeholder="Amount"><button class="btn">Request</button></form>
+<div class="table-wrap"><table class="table"><tr><th>Date</th><th>Amount</th><th>Status</th></tr>
+{% for p in payouts %}<tr><td>{{ p.created|date:"M j, Y" }}</td><td>{{ p.amount|money }}</td><td><span class="pill">{{ p.get_status_display }}</span></td></tr>{% empty %}<tr><td colspan="3" class="muted">No payouts yet.</td></tr>{% endfor %}</table></div>{% endblock %}

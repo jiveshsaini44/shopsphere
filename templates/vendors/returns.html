@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% load shop %}
+{% block title %}Returns{% endblock %}
+{% block content %}{% include "vendors/_nav.html" %}<h1>Return requests</h1>
+{% for r in returns %}<div class="card pad"><div class="between"><div><strong>{{ r.item.name }}</strong> × {{ r.item.quantity }} · {{ r.item.line_total|money }}<br><small class="muted">{{ r.item.order.order_number }} · {{ r.user.username }} · {{ r.created|date:"M j" }}</small><p>“{{ r.reason }}”</p></div>
+<div>{% if r.status == "requested" %}<form method="post" action="{% url 'vendor_return_resolve' r.pk %}" class="inline">{% csrf_token %}<button name="action" value="approve" class="btn btn-sm">Approve &amp; refund</button><button name="action" value="reject" class="btn btn-sm btn-danger">Reject</button></form>{% else %}<span class="pill">{{ r.get_status_display }}</span>{% endif %}</div></div></div>
+{% empty %}<p class="muted">No return requests.</p>{% endfor %}{% endblock %}

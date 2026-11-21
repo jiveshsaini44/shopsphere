@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load shop %}
+{% block title %}Order {{ order.order_number }}{% endblock %}
+{% block content %}
+<div class="between"><h1>Order {{ order.order_number }}</h1>
+  <div><a class="btn btn-ghost" href="{% url 'invoice' order.order_number %}" target="_blank">Invoice</a>
+  {% if order.payment_status == "unpaid" and order.payment_method == "card" and order.status != "cancelled" %}<a class="btn" href="{% url 'mock_pay' order.order_number %}">Pay now</a>{% endif %}
+  {% if order.can_cancel %}<form method="post" action="{% url 'order_cancel' order.order_number %}" style="display:inline" onsubmit="return confirm('Cancel this whole order?')">{% csrf_token %}<button class="btn btn-danger">Cancel order</button></form>{% endif %}</div></div>
+{% if order.status == "cancelled" %}<div class="msg msg-error">This order was cancelled.</div>
+{% else %}<ol class="timeline">{% for s in steps %}<li class="{% if forloop.counter0 <= step_idx %}done{% endif %}">{{ s|capfirst }}</li>{% endfor %}</ol>{% endif %}
+<div class="two-col-page">
+  <section class="card pad"><h2>Items</h2>
+    {% for i in order.items.all %}
+    <div class="item-row"><div><strong>{% if i.product %}<a href="{{ i.product.get_absolute_url }}">{{ i.name }}</a>{% else %}{{ i.name }}{% endif %}</strong>{% if i.variant_name %} <small>({{ i.variant_name }})</small>{% endif %}<br>
+      <small class="muted">Sold by {{ i.vendor.store_name }} · Qty {{ i.quantity }} · {{ i.price|money }} each</small><br>
+      <span class="pill st-{{ i.status }}">{{ i.get_status_display }}</span>
+      {% if i.tracking_number %}<small> {{ i.carrier }} tracking: <code>{{ i.tracking_number }}</code></small>{% endif %}</div>
+      <div class="price">{{ i.line_total|money }}</div></div>
+      {% if i.can_return %}<details class="return"><summary>Return this item</summary>
+        <form method="post" action="{% url 'return_request' i.pk %}">{% csrf_token %}<input name="reason" placeholder="Why are you returning it?" required><button class="btn btn-sm">Request return</button></form></details>{% endif %}
+      {% for r in i.returns.all %}<p class="small muted">Return {{ r.get_status_display|lower }} ({{ r.created|date:"M j" }})</p>{% endfor %}
+    {% endfor %}</section>
+  <aside class="card pad"><h2>Summary</h2>
+    <dl class="totals"><dt>Subtotal</dt><dd>{{ order.subtotal|money }}</dd>
+      {% if order.discount %}<dt>Discount ({{ order.coupon_code }})</dt><dd class="ok">-{{ order.discount|money }}</dd>{% endif %}
+      <dt>Shipping</dt><dd>{{ order.shipping|money }}</dd><dt>Tax</dt><dd>{{ order.tax|money }}</dd>
+      {% if order.refunded_amount %}<dt>Refunded</dt><dd>{{ order.refunded_amount|money }}</dd>{% endif %}
+      <dt class="grand">Total</dt><dd class="grand">{{ order.total|money }}</dd></dl>
+    <p><strong>Payment:</strong> {{ order.get_payment_method_display }} – {{ order.get_payment_status_display }}</p>
+    <p><strong>Ship to:</strong><br>{{ order.ship_name }}<br>{{ order.ship_line1 }} {{ order.ship_line2 }}<br>{{ order.ship_city }} {{ order.ship_state }} {{ order.ship_postal }}<br>{{ order.ship_country }}<br>{{ order.ship_phone }}</p></aside>
+</div>
+{% endblock %}

@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}Create account{% endblock %}
+{% block content %}<div class="narrow"><h1>Create your account</h1>
+<form method="post" class="card pad">{% csrf_token %}{% include "partials/form.html" %}<button class="btn btn-lg btn-block">Sign up</button>
+<p>Already registered? <a href="{% url 'login' %}">Log in</a></p></form></div>{% endblock %}

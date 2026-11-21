@@ -1,0 +1,4 @@
+{% extends "base.html" %}
+{% block title %}Store settings{% endblock %}
+{% block content %}{% include "vendors/_nav.html" %}<div class="narrow"><h1>Store settings</h1>
+<form method="post" enctype="multipart/form-data" class="card pad">{% csrf_token %}{% include "partials/form.html" %}<button class="btn">Save</button></form></div>{% endblock %}

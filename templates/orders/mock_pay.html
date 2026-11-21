@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% load shop %}
+{% block title %}Pay for {{ order.order_number }}{% endblock %}
+{% block content %}
+<div class="narrow"><h1>Secure payment</h1>
+<p>Order <strong>{{ order.order_number }}</strong> · Amount due <strong>{{ order.total|money }}</strong></p>
+<div class="msg msg-info">Demo gateway: use any 16-digit number (e.g. <code>4242 4242 4242 4242</code>). <code>4000 0000 0000 0002</code> simulates a declined card.</div>
+<form method="post" class="card pad">{% csrf_token %}{% include "partials/form.html" %}<button class="btn btn-lg btn-block">Pay {{ order.total|money }}</button></form></div>
+{% endblock %}

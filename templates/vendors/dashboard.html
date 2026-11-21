@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load shop %}
+{% block title %}Seller dashboard{% endblock %}
+{% block content %}{% include "vendors/_nav.html" %}
+<h1>{{ vendor.store_name }} – dashboard</h1>
+<div class="stats">
+  <div class="card pad stat"><small>Sales (30 days)</small><strong>{{ gross_30d|money }}</strong></div>
+  <div class="card pad stat"><small>To ship</small><strong>{{ orders_to_ship }}</strong></div>
+  <div class="card pad stat"><small>Available balance</small><strong>{{ vendor.balance|money }}</strong></div>
+  <div class="card pad stat"><small>Products</small><strong>{{ product_count }}</strong></div>
+  <div class="card pad stat"><small>Open returns</small><strong>{{ open_returns }}</strong></div>
+  <div class="card pad stat"><small>Commission</small><strong>{{ vendor.commission_rate }}%</strong></div>
+</div>
+<section class="card pad"><h2>Revenue – last 30 days</h2><div id="revenue-chart" class="chart" data-url="/api/vendor/stats/"></div></section>
+<div class="two-col-page">
+  <section class="card pad"><h2>Recent order items</h2>
+    {% for i in recent %}<div class="item-row"><span>{{ i.name }} × {{ i.quantity }}<br><small class="muted">{{ i.order.order_number }}</small></span><span class="pill st-{{ i.status }}">{{ i.get_status_display }}</span></div>{% empty %}<p class="muted">No orders yet.</p>{% endfor %}</section>
+  <section class="card pad"><h2>Low stock</h2>
+    {% for p in low_stock %}<div class="item-row"><a href="{% url 'vendor_product_edit' p.pk %}">{{ p.name }}</a><span class="pill {% if p.stock == 0 %}st-cancelled{% endif %}">{{ p.stock }} left</span></div>{% empty %}<p class="muted">All good 🎉</p>{% endfor %}
+    <h2>Top sellers</h2>{% for t in top_products %}<div class="item-row"><span>{{ t.name }}</span><strong>{{ t.units }} sold</strong></div>{% empty %}<p class="muted">–</p>{% endfor %}</section>
+</div>{% endblock %}

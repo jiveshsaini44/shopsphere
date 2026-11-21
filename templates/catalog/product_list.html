@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{% if category %}{{ category.name }}{% elif q %}Search: {{ q }}{% else %}All products{% endif %} – {{ SHOP_NAME }}{% endblock %}
+{% block content %}
+<div class="listing">
+  <aside class="filters card">
+    <form method="get">
+      {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+      <h3>Categories</h3>
+      <ul class="catlist"><li><a href="{% url 'product_list' %}">All</a></li>
+      {% for c in categories %}<li><a href="{{ c.get_absolute_url }}" {% if category.pk == c.pk %}class="active"{% endif %}>{{ c.icon }} {{ c.name }}</a>
+        {% if c.children.all %}<ul>{% for ch in c.children.all %}<li><a href="{{ ch.get_absolute_url }}">{{ ch.name }}</a></li>{% endfor %}</ul>{% endif %}</li>{% endfor %}</ul>
+      <h3>Price</h3>
+      <div class="two"><input type="number" name="min_price" min="0" placeholder="Min" value="{{ f.min_price }}"><input type="number" name="max_price" min="0" placeholder="Max" value="{{ f.max_price }}"></div>
+      <h3>Rating</h3>
+      <select name="rating"><option value="">Any</option><option value="4" {% if f.rating == "4" %}selected{% endif %}>4★ &amp; up</option><option value="3" {% if f.rating == "3" %}selected{% endif %}>3★ &amp; up</option></select>
+      <label class="check"><input type="checkbox" name="in_stock" value="1" {% if f.in_stock %}checked{% endif %}> In stock only</label>
+      <label class="check"><input type="checkbox" name="on_sale" value="1" {% if f.on_sale %}checked{% endif %}> On sale</label>
+      <button class="btn btn-block" type="submit">Apply filters</button>
+    </form>
+  </aside>
+  <section>
+    <div class="list-head">
+      <h1>{% if category %}{{ category.icon }} {{ category.name }}{% elif q %}Results for “{{ q }}”{% else %}All products{% endif %} <small class="muted">({{ page.paginator.count }})</small></h1>
+      <form method="get" class="sort">{% for k, v in f.items %}{% if k != "sort" and k != "page" %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endif %}{% endfor %}
+        <label>Sort <select name="sort" onchange="this.form.submit()">
+          <option value="newest" {% if sort == "newest" %}selected{% endif %}>Newest</option>
+          <option value="price_asc" {% if sort == "price_asc" %}selected{% endif %}>Price: low to high</option>
+          <option value="price_desc" {% if sort == "price_desc" %}selected{% endif %}>Price: high to low</option>
+          <option value="popular" {% if sort == "popular" %}selected{% endif %}>Most popular</option>
+          <option value="rating" {% if sort == "rating" %}selected{% endif %}>Top rated</option></select></label></form>
+    </div>
+    <div class="grid">{% for p in page %}{% include "partials/product_card.html" %}{% empty %}<p class="muted">No products match your search.</p>{% endfor %}</div>
+    {% include "partials/pagination.html" %}
+  </section>
+</div>
+{% endblock %}

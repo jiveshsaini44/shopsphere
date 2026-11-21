@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load shop %}
+{% block title %}Seller orders{% endblock %}
+{% block content %}{% include "vendors/_nav.html" %}
+<h1>Orders to fulfil</h1>
+<form method="get" class="inline"><select name="status" onchange="this.form.submit()"><option value="">All statuses</option>
+<option value="pending" {% if status == "pending" %}selected{% endif %}>Pending</option><option value="processing" {% if status == "processing" %}selected{% endif %}>Processing</option><option value="shipped" {% if status == "shipped" %}selected{% endif %}>Shipped</option><option value="delivered" {% if status == "delivered" %}selected{% endif %}>Delivered</option><option value="cancelled" {% if status == "cancelled" %}selected{% endif %}>Cancelled</option><option value="returned" {% if status == "returned" %}selected{% endif %}>Returned</option></select></form>
+{% for i in page %}
+<div class="card pad">
+  <div class="between"><div><strong>{{ i.name }}</strong> {% if i.variant_name %}({{ i.variant_name }}){% endif %} × {{ i.quantity }}<br>
+    <small class="muted">{{ i.order.order_number }} · {{ i.order.created|date:"M j, Y" }} · {{ i.order.get_payment_method_display }} / {{ i.order.get_payment_status_display }}</small></div>
+    <div><span class="pill st-{{ i.status }}">{{ i.get_status_display }}</span><br><small>You earn {{ i.vendor_earning|money }}</small></div></div>
+  <p class="small">Ship to: {{ i.order.ship_name }}, {{ i.order.ship_line1 }}, {{ i.order.ship_city }} {{ i.order.ship_postal }}, {{ i.order.ship_country }} · {{ i.order.ship_phone }}</p>
+  {% with nxt=transitions|get_item:i.status %}{% if nxt %}
+  <form method="post" action="{% url 'vendor_item_update' i.pk %}" class="inline">{% csrf_token %}
+    <select name="status">{% for s in nxt %}<option value="{{ s }}">Mark {{ s }}</option>{% endfor %}</select>
+    <input name="carrier" placeholder="Carrier (when shipping)"><input name="tracking_number" placeholder="Tracking no.">
+    <button class="btn btn-sm">Update</button></form>{% endif %}{% endwith %}
+</div>
+{% empty %}<p class="muted">No orders found.</p>{% endfor %}
+{% include "partials/pagination.html" %}{% endblock %}
